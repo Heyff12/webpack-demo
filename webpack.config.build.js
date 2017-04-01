@@ -2,8 +2,8 @@ var path = require('path');
 var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var htmlWebpackPlugin = require('html-webpack-plugin'); //html的页面生产
-var px2rem = require('postcss-px2rem'); //css像素自适应--移动端页面需要
-var WebpackBrowserPlugin = require('webpack-browser-plugin'); //自动在浏览器打开页面--只有dev使用
+var ExtractTextPlugin = require('extract-text-webpack-plugin');//css单独生成--只有build使用
+var CleanPlugin = require('clean-webpack-plugin');// 删除文件夹--只有build使用
 module.exports = {
     // context:,
     entry: './src/app.js', //一个js文件--single entry
@@ -14,6 +14,7 @@ module.exports = {
         //publicPath:'/qudao/v1/static/',//生产的html在资源路径前面添加的内容
         //sourceMapFilename:'js/[name]-[chunkhash].js.map',
     },
+    devtool: '#source-map',//生成map文件----只有build使用
     module: {
         loaders: [{
             test: /\.jsx?$/,
@@ -30,15 +31,13 @@ module.exports = {
             test: /\.tpl$/,
             loader: 'ejs-loader',
         }, {
-            test: /\.ejs$/,
-            loader: 'ejs-loader',
-        }, {
             test: /\.css$/,
             loader: 'style-loader!css-loader?importLoaders=1!postcss-loader',
             // loaders:['style-loader','css-loader','postcss-loader']
         }, {
             test: /\.less$/,
-            loader: 'style-loader!css-loader!postcss-loader!less-loader',
+            //loader: 'style-loader!css-loader!postcss-loader!less-loader',            
+            loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader!postcss-loader!less-loader' }),//写法不同----只有build使用
         }, {
             test: /\.json$/,
             loader: 'json-loader',
@@ -53,23 +52,14 @@ module.exports = {
             //loaders: ['url-loader?limit=20000&name=assets/[name]-[hash:5].[ext]','image-webpack-loader'],
         }]
     },
-    devServer: {
-        port: 8084,
-        inline: true,
-    },
-    // postcss: [
-    //     require('autoprefixer')({
-    //         broswers: ['last 5 versions']
-    //     })
-    // ],
     plugins: [
-        new WebpackBrowserPlugin(),
-        //new webpack.BannerPlugin('# coding: utf-8'),//在js的头部增加信息
+        new CleanPlugin(['dist']),
+        new ExtractTextPlugin('css/[name].[contenthash].css'),
+        //new webpack.BannerPlugin(''),//在js的头部增加信息
         new webpack.LoaderOptionsPlugin({
             options: {
                 postcss: function() {
-                    // return [autoprefixer({ browsers: ['last 5 versions'] }), px2rem({ remUnit: 37.5 })];
-                    return [autoprefixer({ browsers: ['last 5 versions'] })];
+                    return [autoprefixer];
                 }
             }
         }),

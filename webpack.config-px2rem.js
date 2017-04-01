@@ -2,7 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var htmlWebpackPlugin = require('html-webpack-plugin'); //html的页面生产
-var px2rem = require('postcss-px2rem'); //css像素自适应--移动端页面需要
+var px2rem = require('postcss-px2rem'); //css像素自适应
 var WebpackBrowserPlugin = require('webpack-browser-plugin'); //自动在浏览器打开页面--只有dev使用
 module.exports = {
     // context:,
@@ -68,8 +68,7 @@ module.exports = {
         new webpack.LoaderOptionsPlugin({
             options: {
                 postcss: function() {
-                    // return [autoprefixer({ browsers: ['last 5 versions'] }), px2rem({ remUnit: 37.5 })];
-                    return [autoprefixer({ browsers: ['last 5 versions'] })];
+                    return [autoprefixer({ browsers: ['last 5 versions'] }), px2rem({ remUnit: 37.5 })];
                 }
             }
         }),
